@@ -221,17 +221,21 @@ const onGeneratePlasma = () => {
     
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
-        // Plasma math combining sine waves with higher frequency for smaller zones
-        let v1 = Math.sin(x * 0.4 + t)
-        let v2 = Math.sin(y * 0.4 + t)
-        let v3 = Math.sin((x + y + t) * 0.4)
-        let cx = x + 0.5 * Math.sin(t / 2.0)
-        let cy = y + 0.5 * Math.cos(t / 1.5)
-        let v4 = Math.sin(Math.sqrt(cx*cx + cy*cy) * 0.4)
+        // Break symmetry: Use different frequencies and phase shifts for X and Y
+        let v1 = Math.sin(x * 0.35 + t * 1.2)
+        let v2 = Math.sin(y * 0.25 + t * 0.8 + x * 0.1) // Cross-axis influence
+        
+        // Diagonal offset that skews over time
+        let v3 = Math.sin((x * 0.3 + y * 0.5 + t) * 0.6)
+        
+        // Moving center point that wanders around the grid
+        let cx = x - (COLS / 2 + COLS * 0.3 * Math.sin(t * 0.5))
+        let cy = y - (ROWS / 2 + ROWS * 0.4 * Math.cos(t * 0.7))
+        let v4 = Math.sin(Math.sqrt(cx * cx + cy * cy) * 0.45 - t * 1.5)
         
         let v = v1 + v2 + v3 + v4
         
-        // Map to 0..1
+        // Map to 0..1 broadly (-4 to 4 range)
         let intensity = (v + 4) / 8
         
         // Sharpen contrast for halftone style
