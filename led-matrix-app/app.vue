@@ -66,13 +66,20 @@ const animationName = ref<string>('matrix_animation')
 const onKeyDown = (e: KeyboardEvent) => {
   // Ignore if user is typing in an input
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+  if (e.repeat) return // Prevent lag when holding the key down
   
+  let handled = true
   switch(e.key.toLowerCase()) {
     case 'r': store.currentTool.value = 'erase'; break;
     case 't': store.currentTool.value = 'draw'; break;
     case 'f': store.currentTool.value = 'fill'; break;
     case 'x': store.currentTool.value = 'row_pencil'; break;
     case 'c': store.currentTool.value = 'col_pencil'; break;
+    default: handled = false; break;
+  }
+  
+  if (handled) {
+    e.preventDefault()
   }
 }
 
