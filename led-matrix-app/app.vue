@@ -283,15 +283,19 @@ const importCode = async (event: Event) => {
   store.frames.value = []
   
   for (let f = 0; f < numFrames; f++) {
-    const frame: string[][] = []
-    for (let y = 0; y < ROWS; y++) {
-      const row: string[] = []
-      for (let x = 0; x < COLS; x++) {
-        const index = f * frameSize + y * COLS + x
+    // Create an empty MatrixFrame (ROWS x COLS filled with black)
+    const frame: string[][] = Array.from({ length: ROWS }, () => Array(COLS).fill('#000000'))
+    
+    // Parse the [X][Y] format where Y=0 is bottom
+    for (let x = 0; x < COLS; x++) {
+      for (let y = 0; y < ROWS; y++) {
+        const index = f * frameSize + x * ROWS + y
         const hex = hexMatches[index].replace('0x', '#')
-        row.push(hex)
+        
+        // Map Y coordinate (origin bottom-left) to internal row (origin top-left)
+        const internalY = (ROWS - 1) - y
+        frame[internalY][x] = hex
       }
-      frame.push(row)
     }
     store.frames.value.push(frame)
   }
@@ -317,30 +321,29 @@ const exportCode = () => {
   hCode += `const uint8_t MATRIX_WIDTH_${baseName.toUpperCase()} = ${COLS};\n`
   hCode += `const uint8_t MATRIX_HEIGHT_${baseName.toUpperCase()} = ${ROWS};\n\n`
 
-  // Store 1D array of uint32_t for each frame
-  hCode += `const uint32_t ${baseName}[${store.frames.value.length}][${ROWS * COLS}] PROGMEM = {\n`
+  // Store 3D array: [frames][x][y] with origin at bottom-left
+  hCode += `const uint32_t ${baseName}[${store.frames.value.length}][${COLS}][${ROWS}] PROGMEM = {\n`
   
   store.frames.value.forEach((frame, fIndex) => {
-    hCode += `  {\n    // Frame ${fIndex + 1}\n    `
-    let colors: string[] = []
+    hCode += `  {\n    // Frame ${fIndex + 1}\n`
     
-    for (let y = 0; y < ROWS; y++) {
-      for (let x = 0; x < COLS; x++) {
-        let hex = frame[y][x]
+    for (let x = 0; x < COLS; x++) {
+      hCode += `    { `
+      let colColors: string[] = []
+      
+      for (let y = 0; y < ROWS; y++) {
+        // Map Y coordinate (origin bottom-left) to internal row
+        let internalY = (ROWS - 1) - y
+        let hex = frame[internalY][x]
+        
         // Convert #RRGGBB to 0xRRGGBB
         hex = '0x' + hex.substring(1).toUpperCase()
-        colors.push(hex)
+        colColors.push(hex)
       }
+      
+      hCode += colColors.join(', ') + ` }${x < COLS - 1 ? ',' : ''}\n`
     }
-    
-    // format to max 8 colors per line to keep it clean
-    for (let i = 0; i < colors.length; i += 8) {
-      hCode += colors.slice(i, i + 8).join(', ')
-      if (i + 8 < colors.length) {
-        hCode += ',\n    '
-      }
-    }
-    hCode += `\n  }${fIndex < store.frames.value.length - 1 ? ',' : ''}\n`
+    hCode += `  }${fIndex < store.frames.value.length - 1 ? ',' : ''}\n`
   })
 
   hCode += `};\n\n#endif // ${guardName}\n`
