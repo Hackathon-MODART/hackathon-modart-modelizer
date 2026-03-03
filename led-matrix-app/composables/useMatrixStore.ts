@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 
-export type ToolType = 'draw' | 'erase' | 'fill'
+export type ToolType = 'draw' | 'erase' | 'fill' | 'row_pencil' | 'col_pencil'
 export type MatrixFrame = string[][]
 
 export const COLS = 32
@@ -14,10 +14,28 @@ export function createEmptyFrame(): MatrixFrame {
 // Global state using Vue refs
 const frames = ref<MatrixFrame[]>([createEmptyFrame()])
 const currentFrameIndex = ref<number>(0)
-const selectedColor = ref<string>('#58a6ff')
+const selectedColor = ref<string>('#072667')
+const selectedIntensity = ref<number>(60)
 const currentTool = ref<ToolType>('draw')
 const isPlaying = ref<boolean>(false)
 const fps = ref<number>(10)
+
+// Helper to apply intensity (0-100) to a hex color (#RRGGBB)
+export const applyIntensity = (hexColor: string, intensityPercent: number) => {
+    if (hexColor === '#000000' || hexColor.toLowerCase() === '#000') return hexColor;
+
+    let r = parseInt(hexColor.slice(1, 3), 16)
+    let g = parseInt(hexColor.slice(3, 5), 16)
+    let b = parseInt(hexColor.slice(5, 7), 16)
+
+    const factor = intensityPercent / 100
+    r = Math.min(255, Math.max(0, Math.floor(r * factor)))
+    g = Math.min(255, Math.max(0, Math.floor(g * factor)))
+    b = Math.min(255, Math.max(0, Math.floor(b * factor)))
+
+    const toHex = (n: number) => n.toString(16).padStart(2, '0')
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
 
 export const useMatrixStore = () => {
     const currentFrame = computed(() => frames.value[currentFrameIndex.value])
@@ -29,12 +47,22 @@ export const useMatrixStore = () => {
     }
 
     const applyTool = (row: number, col: number) => {
+        const activeColor = applyIntensity(selectedColor.value, selectedIntensity.value)
+
         if (currentTool.value === 'draw') {
-            setPixel(row, col, selectedColor.value)
+            setPixel(row, col, activeColor)
         } else if (currentTool.value === 'erase') {
             setPixel(row, col, DEFAULT_COLOR)
         } else if (currentTool.value === 'fill') {
-            fillGrid(selectedColor.value)
+            fillGrid(activeColor)
+        } else if (currentTool.value === 'row_pencil') {
+            for (let c = 0; c < COLS; c++) {
+                setPixel(row, c, activeColor)
+            }
+        } else if (currentTool.value === 'col_pencil') {
+            for (let r = 0; r < ROWS; r++) {
+                setPixel(r, col, activeColor)
+            }
         }
     }
 
@@ -77,6 +105,7 @@ export const useMatrixStore = () => {
         currentFrameIndex,
         currentFrame,
         selectedColor,
+        selectedIntensity,
         currentTool,
         isPlaying,
         fps,
