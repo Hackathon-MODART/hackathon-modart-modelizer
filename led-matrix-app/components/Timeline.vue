@@ -17,7 +17,12 @@
         :key="index"
         class="frame-thumbnail"
         :class="{ active: currentFrameIndex === index }"
+        draggable="true"
         @click="selectFrame(index)"
+        @dragstart="onDragStart($event, index)"
+        @dragover.prevent
+        @dragenter.prevent
+        @drop="onDrop($event, index)"
       >
         <div class="frame-number">{{ index + 1 }}</div>
         <!-- Thumbnail representation -->
@@ -53,7 +58,7 @@
 import { ref, watch, onUnmounted, nextTick } from 'vue'
 
 const store = useMatrixStore()
-const { frames, currentFrameIndex, isPlaying, fps, selectFrame, addFrame, duplicateFrame, deleteFrame } = store
+const { frames, currentFrameIndex, isPlaying, fps, selectFrame, addFrame, duplicateFrame, deleteFrame, moveFrame } = store
 
 let timer: ReturnType<typeof setInterval> | null = null
 const framesListRef = ref<HTMLElement | null>(null)
@@ -122,6 +127,23 @@ const addFrameAndScroll = async () => {
 const duplicateFrameAndScroll = async () => {
   duplicateFrame()
   await scrollToActiveFrame()
+}
+
+const onDragStart = (e: DragEvent, index: number) => {
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', index.toString())
+  }
+}
+
+const onDrop = (e: DragEvent, dropIndex: number) => {
+  if (e.dataTransfer) {
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'), 10)
+    if (!isNaN(dragIndex) && dragIndex !== dropIndex) {
+      moveFrame(dragIndex, dropIndex)
+      scrollToActiveFrame()
+    }
+  }
 }
 
 watch(currentFrameIndex, () => {

@@ -217,21 +217,23 @@ const onGeneratePlasma = () => {
   for (let f = 0; f < numFrames; f++) {
     store.addFrame()
     store.clearGrid()
-    let t = f * 0.3 // Time step
+    // t completes exactly one full circle (2 * PI) over numFrames for seamless looping
+    let t = (f / numFrames) * Math.PI * 2
     
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
         // Break symmetry: Use different frequencies and phase shifts for X and Y
-        let v1 = Math.sin(x * 0.35 + t * 1.2)
-        let v2 = Math.sin(y * 0.25 + t * 0.8 + x * 0.1) // Cross-axis influence
+        // Variables added to `t` must be integers multiplied by `t` (e.g. t, 2*t, -t) to loop perfectly
+        let v1 = Math.sin(x * 0.35 + t)
+        let v2 = Math.sin(y * 0.25 + x * 0.1 - t) 
         
         // Diagonal offset that skews over time
-        let v3 = Math.sin((x * 0.3 + y * 0.5 + t) * 0.6)
+        let v3 = Math.sin(x * 0.3 + y * 0.5 + t * 2)
         
-        // Moving center point that wanders around the grid
-        let cx = x - (COLS / 2 + COLS * 0.3 * Math.sin(t * 0.5))
-        let cy = y - (ROWS / 2 + ROWS * 0.4 * Math.cos(t * 0.7))
-        let v4 = Math.sin(Math.sqrt(cx * cx + cy * cy) * 0.45 - t * 1.5)
+        // Moving center point that wanders around the grid circularly
+        let cx = x - (COLS / 2 + COLS * 0.3 * Math.sin(t))
+        let cy = y - (ROWS / 2 + ROWS * 0.4 * Math.cos(t))
+        let v4 = Math.sin(Math.sqrt(cx * cx + cy * cy) * 0.45 + t)
         
         let v = v1 + v2 + v3 + v4
         
