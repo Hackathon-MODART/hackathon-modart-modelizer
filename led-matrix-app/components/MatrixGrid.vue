@@ -1,23 +1,36 @@
 <template>
   <div class="matrix-container">
-    <div v-if="presentColors.length > 0" class="color-palette glass">
+    <div v-if="stableColorPallete.length > 0" class="color-palette glass">
       <span class="palette-label">Colors in frame:</span>
       <div 
-        v-for="c in presentColors" 
-        :key="c" 
-        class="color-item" 
-        :title="`Change all ${c} pixels`"
-        @mouseenter="hoveredPaletteColor = c"
-        @mouseleave="hoveredPaletteColor = null"
+        v-for="item in stableColorPallete" 
+        :key="item.original" 
+        class="palette-item-container"
       >
-        <input 
-          type="color" 
-          :value="c"
-          @mouseenter="hoveredPaletteColor = c"
+        <div 
+          class="color-item" 
+          :title="`Change all ${item.original} pixels`"
+          @mouseenter="hoveredPaletteColor = item.current"
           @mouseleave="hoveredPaletteColor = null"
-          @change="(e) => changeColorInFrame(c, e)"
-          class="palette-input"
-        />
+        >
+          <input 
+            type="color" 
+            :value="item.current"
+            @mouseenter="hoveredPaletteColor = item.current"
+            @mouseleave="hoveredPaletteColor = null"
+            @mousedown="onColorInputStart(item.current)"
+            @input="(e) => changeColorInFrame(item.original, item.current, e)"
+            class="palette-input"
+          />
+        </div>
+        <button 
+          v-if="item.current.toUpperCase() !== item.original.toUpperCase()" 
+          class="reset-mini-btn" 
+          @click="resetColorInFrame(item.original, item.current)"
+          title="Reset to original color"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+        </button>
       </div>
     </div>
 
@@ -79,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useMatrixStore, COLS, ROWS, DEFAULT_COLOR } from '../composables/useMatrixStore'
 
 const store = useMatrixStore()
@@ -87,30 +100,77 @@ const { currentFrame, applyTool } = store
 
 const hoveredPaletteColor = ref<string | null>(null)
 
-const presentColors = computed(() => {
+const stableColorPallete = ref<{ original: string, current: string }[]>([])
+
+// Logic to keep the palette stable while editing
+const updateStablePalette = () => {
   const colors = new Set<string>()
-  if (!currentFrame.value) return []
+  if (!currentFrame.value) {
+    stableColorPallete.value = []
+    return
+  }
   
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      const color = currentFrame.value[r][c]
-      colors.add(color.toUpperCase())
+      colors.add(currentFrame.value[r][c].toUpperCase())
     }
   }
-  return Array.from(colors)
-})
 
-const changeColorInFrame = (oldColor: string, event: Event) => {
+  const newColors = Array.from(colors)
+  
+  // Update existing or add new
+  const updatedPalette = newColors.map(hex => {
+    const existing = stableColorPallete.value.find(item => item.current === hex)
+    return existing ? existing : { original: hex, current: hex }
+  })
+
+  // Remove colors no longer in frame (optional, maybe keep them if they are being edited?)
+  stableColorPallete.value = updatedPalette
+}
+
+// Initial load and watch for frame changes
+watch(currentFrame, () => {
+  // Only refresh if no major editing is happening? 
+  // For now, simpler: refresh on frame change
+  updateStablePalette()
+}, { immediate: true, deep: true })
+
+const onColorInputStart = (currentColor: string) => {
+  store.saveSnapshot()
+}
+
+const changeColorInFrame = (originalColor: string, currentColor: string, event: Event) => {
   const newColor = (event.target as HTMLInputElement).value.toUpperCase()
   if (!currentFrame.value) return
 
+  // Update data in grid
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      if (currentFrame.value[r][c].toUpperCase() === oldColor) {
+      if (currentFrame.value[r][c].toUpperCase() === currentColor.toUpperCase()) {
         currentFrame.value[r][c] = newColor
       }
     }
   }
+
+  // Update stable palette current state to keep the input bound
+  const item = stableColorPallete.value.find(i => i.original === originalColor)
+  if (item) item.current = newColor
+}
+
+const resetColorInFrame = (originalColor: string, currentColor: string) => {
+  if (!currentFrame.value) return
+  store.saveSnapshot()
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (currentFrame.value[r][c].toUpperCase() === currentColor.toUpperCase()) {
+        currentFrame.value[r][c] = originalColor.toUpperCase()
+      }
+    }
+  }
+
+  const item = stableColorPallete.value.find(i => i.original === originalColor)
+  if (item) item.current = originalColor.toUpperCase()
 }
 
 const isDrawing = ref(false)
@@ -143,11 +203,40 @@ const onMouseEnter = (row: number, col: number) => {
 .color-palette {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   padding: 8px 16px;
   border-radius: 8px;
   flex-wrap: wrap;
   max-width: 100%;
+}
+
+.palette-item-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+.reset-mini-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.reset-mini-btn:hover {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+  transform: rotate(-45deg);
 }
 
 .palette-label {
