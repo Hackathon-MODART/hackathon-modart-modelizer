@@ -826,6 +826,18 @@ const exportCode = async () => {
     return;
   }
 
+  if (window.location.protocol === "https:") {
+    const proceed = confirm(
+      "Attention : Vous êtes sur un site sécurisé (HTTPS). Le navigateur bloque par défaut les appels vers l'ESP32 (HTTP).\n\n" +
+      "Pour corriger cela :\n" +
+      "1. Cliquez sur le cadenas à gauche de l'URL\n" +
+      "2. Paramètres du site\n" +
+      "3. Autorisez le 'Contenu non sécurisé'\n\n" +
+      "Voulez-vous quand même essayer ?"
+    );
+    if (!proceed) return;
+  }
+
   const fpsInput = prompt("FPS (frames per second):", "20");
   if (fpsInput === null) return; // User cancelled
   const fps = parseInt(fpsInput, 10) || 20;
@@ -1314,7 +1326,7 @@ const loadPattern = (pattern: LedPattern) => {
 .toast-container {
   position: fixed;
   top: 24px;
-  right: 24px;
+  left: 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1403,14 +1415,14 @@ const loadPattern = (pattern: LedPattern) => {
   }
 }
 
-/* Vue Transition for Toasts - Top right animation */
+/* Vue Transition for Toasts - Top left animation */
 .toast-enter-active,
 .toast-leave-active {
   transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .toast-enter-from {
   opacity: 0;
-  transform: translateX(60px) scale(0.9) translateY(-20px);
+  transform: translateX(-60px) scale(0.9) translateY(-20px);
 }
 .toast-leave-to {
   opacity: 0;
