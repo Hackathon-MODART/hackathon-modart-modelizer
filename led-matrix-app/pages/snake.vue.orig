@@ -42,7 +42,7 @@
         </div>
         
         <p style="color: var(--text-secondary); margin-top: 20px; font-size: 0.85rem;">
-          Use Arrow Keys or WASD to control. Output streams automatically to http://192.168.4.1/animation
+          Use Arrow Keys or WASD to control. Output streams automatically to http://192.168.4.1/static
         </p>
       </div>
     </main>

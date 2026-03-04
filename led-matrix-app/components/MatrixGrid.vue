@@ -94,9 +94,7 @@ const presentColors = computed(() => {
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const color = currentFrame.value[r][c]
-      if (color !== DEFAULT_COLOR) {
-        colors.add(color.toUpperCase())
-      }
+      colors.add(color.toUpperCase())
     }
   }
   return Array.from(colors)
