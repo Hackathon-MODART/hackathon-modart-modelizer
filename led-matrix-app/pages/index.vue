@@ -797,7 +797,8 @@ const importImage = async (event: Event) => {
         // alpha ignored — treat as opaque
 
         const toHex = (n: number) => n.toString(16).padStart(2, "0");
-        const hexColor = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        const rawHex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        const hexColor = applyIntensity(rawHex, 20);
 
         store.setPixel(y, x, hexColor);
       }
