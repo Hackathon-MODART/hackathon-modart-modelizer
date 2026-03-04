@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 
-export type ToolType = 'draw' | 'erase' | 'fill' | 'row_pencil' | 'col_pencil'
+export type ToolAction = 'draw' | 'erase' | 'fill'
+export type ActionMode = 'single' | 'row' | 'col'
 export type MatrixFrame = string[][]
 
 export const COLS = 32
@@ -16,7 +17,8 @@ const frames = ref<MatrixFrame[]>([createEmptyFrame()])
 const currentFrameIndex = ref<number>(0)
 const selectedColor = ref<string>('#072667')
 const selectedIntensity = ref<number>(60)
-const currentTool = ref<ToolType>('draw')
+const currentTool = ref<ToolAction>('draw')
+const currentActionMode = ref<ActionMode>('single')
 const isPlaying = ref<boolean>(false)
 const fps = ref<number>(10)
 
@@ -49,19 +51,22 @@ export const useMatrixStore = () => {
     const applyTool = (row: number, col: number) => {
         const activeColor = applyIntensity(selectedColor.value, selectedIntensity.value)
 
-        if (currentTool.value === 'draw') {
-            setPixel(row, col, activeColor)
-        } else if (currentTool.value === 'erase') {
-            setPixel(row, col, DEFAULT_COLOR)
-        } else if (currentTool.value === 'fill') {
+        if (currentTool.value === 'fill') {
             fillGrid(activeColor)
-        } else if (currentTool.value === 'row_pencil') {
+            return
+        }
+
+        const colorToApply = currentTool.value === 'erase' ? DEFAULT_COLOR : activeColor
+
+        if (currentActionMode.value === 'single') {
+            setPixel(row, col, colorToApply)
+        } else if (currentActionMode.value === 'row') {
             for (let c = 0; c < COLS; c++) {
-                setPixel(row, c, activeColor)
+                setPixel(row, c, colorToApply)
             }
-        } else if (currentTool.value === 'col_pencil') {
+        } else if (currentActionMode.value === 'col') {
             for (let r = 0; r < ROWS; r++) {
-                setPixel(r, col, activeColor)
+                setPixel(r, col, colorToApply)
             }
         }
     }
@@ -120,6 +125,7 @@ export const useMatrixStore = () => {
         selectedColor,
         selectedIntensity,
         currentTool,
+        currentActionMode,
         isPlaying,
         fps,
         setPixel,

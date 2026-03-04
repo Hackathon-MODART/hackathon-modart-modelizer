@@ -15,12 +15,12 @@
     </div>
 
     <div class="tool-section">
-      <label>Tools</label>
+      <label>Action</label>
       <div class="button-group tools-grid">
         <button
           class="btn tool-btn"
           :class="{ active: currentTool === 'draw' }"
-          @click="currentTool = 'draw'"
+          @click="toggleTool('draw')"
           title="Draw (T)"
         >
           <svg
@@ -44,7 +44,7 @@
         <button
           class="btn tool-btn"
           :class="{ active: currentTool === 'erase' }"
-          @click="currentTool = 'erase'"
+          @click="toggleTool('erase')"
           title="Erase (Z)"
         >
           <svg
@@ -64,10 +64,10 @@
           <span class="shortcut-hint">Z</span>
         </button>
         <button
-          class="btn tool-btn"
+          class="btn tool-btn fill-btn"
           :class="{ active: currentTool === 'fill' }"
-          @click="currentTool = 'fill'"
-          title="Fill (F)"
+          @click="toggleTool('fill')"
+          title="Fill Frame (F)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -86,11 +86,45 @@
           </svg>
           <span class="shortcut-hint">F</span>
         </button>
+      </div>
+    </div>
+
+    <div class="tool-section">
+      <label>Selection Mode</label>
+      <div class="button-group tools-grid modes-grid">
         <button
           class="btn tool-btn"
-          :class="{ active: currentTool === 'row_pencil' }"
-          @click="currentTool = 'row_pencil'"
+          :class="{
+            active: currentActionMode === 'single',
+            disabled: currentTool === 'fill',
+          }"
+          @click="setActionMode('single')"
+          title="Single Pixel"
+          :disabled="currentTool === 'fill'"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="6" height="6"></rect>
+          </svg>
+        </button>
+        <button
+          class="btn tool-btn"
+          :class="{
+            active: currentActionMode === 'row',
+            disabled: currentTool === 'fill',
+          }"
+          @click="setActionMode('row')"
           title="Row Pencil (X)"
+          :disabled="currentTool === 'fill'"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -111,9 +145,13 @@
         </button>
         <button
           class="btn tool-btn"
-          :class="{ active: currentTool === 'col_pencil' }"
-          @click="currentTool = 'col_pencil'"
+          :class="{
+            active: currentActionMode === 'col',
+            disabled: currentTool === 'fill',
+          }"
+          @click="setActionMode('col')"
           title="Column Pencil (C)"
+          :disabled="currentTool === 'fill'"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -243,8 +281,8 @@ const {
   selectedColor,
   selectedIntensity,
   currentTool,
+  currentActionMode,
   clearGrid,
-  clearAllFrames,
 } = store;
 
 const emit = defineEmits([
@@ -254,6 +292,16 @@ const emit = defineEmits([
   "generateLogoAnimation",
   "generatePlasma",
 ]);
+
+const toggleTool = (tool: "draw" | "erase" | "fill") => {
+  currentTool.value = tool;
+};
+
+const setActionMode = (mode: "single" | "row" | "col") => {
+  if (currentTool.value !== "fill") {
+    currentActionMode.value = mode;
+  }
+};
 </script>
 
 <style scoped>
@@ -305,8 +353,27 @@ label {
   gap: 8px;
 }
 
+.tools-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.modes-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .tool-btn {
+  height: 44px;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tool-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .shortcut-hint {
