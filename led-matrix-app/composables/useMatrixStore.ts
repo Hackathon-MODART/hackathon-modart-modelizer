@@ -99,17 +99,17 @@ export const useMatrixStore = () => {
         }
     }
 
-    const selectFrame = (index: number) => {
-        if (index >= 0 && index < frames.value.length) {
-            currentFrameIndex.value = index
-        }
-    }
-
     const moveFrame = (fromIndex: number, toIndex: number) => {
         if (fromIndex >= 0 && fromIndex < frames.value.length && toIndex >= 0 && toIndex < frames.value.length && fromIndex !== toIndex) {
             const frameToMove = frames.value.splice(fromIndex, 1)[0]
             frames.value.splice(toIndex, 0, frameToMove)
             currentFrameIndex.value = toIndex
+        }
+    }
+
+    const selectFrame = (index: number) => {
+        if (index >= 0 && index < frames.value.length) {
+            currentFrameIndex.value = index
         }
     }
 
@@ -130,7 +130,7 @@ export const useMatrixStore = () => {
         addFrame,
         duplicateFrame,
         deleteFrame,
-        selectFrame,
-        moveFrame
+        moveFrame,
+        selectFrame
     }
 }

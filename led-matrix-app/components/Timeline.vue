@@ -211,6 +211,7 @@ const {
   duplicateFrame,
   deleteFrame,
   clearAllFrames,
+  moveFrame,
 } = store;
 
 const deleteCurrentFrame = () => {
@@ -296,20 +297,20 @@ const duplicateFrameAndScroll = async () => {
 
 const onDragStart = (e: DragEvent, index: number) => {
   if (e.dataTransfer) {
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('text/plain', index.toString())
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", index.toString());
   }
-}
+};
 
 const onDrop = (e: DragEvent, dropIndex: number) => {
   if (e.dataTransfer) {
-    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'), 10)
+    const dragIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
     if (!isNaN(dragIndex) && dragIndex !== dropIndex) {
-      moveFrame(dragIndex, dropIndex)
-      scrollToActiveFrame()
+      moveFrame(dragIndex, dropIndex);
+      scrollToActiveFrame();
     }
   }
-}
+};
 
 watch(currentFrameIndex, () => {
   if (!isPlaying.value) {
