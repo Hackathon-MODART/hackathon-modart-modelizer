@@ -221,22 +221,6 @@
     <div class="tool-section">
       <label>Animations (Generators)</label>
       <div class="button-group-vertical">
-        <button class="btn" @click="$emit('generateBlink')">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-          Gen: Blink
-        </button>
         <button class="btn" @click="$emit('generateLogoAnimation')">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -352,6 +336,14 @@ const setActionMode = (mode: "single" | "row" | "col") => {
   flex-direction: column;
   gap: 20px;
   height: 100%;
+}
+
+@media (max-width: 1200px) {
+  .toolbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }
 
 .tool-section {

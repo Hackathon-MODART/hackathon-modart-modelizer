@@ -145,7 +145,6 @@
         <div class="toolbar-wrapper glass">
           <h3>Tools</h3>
           <Toolbar
-            @generateBlink="onGenerateBlink"
             @generateCircle="onGenerateCircle"
             @generateLogo="onGenerateLogo"
             @generateLogoAnimation="onGenerateLogoAnimation"
@@ -467,17 +466,6 @@ onUnmounted(() => {
 });
 
 // --- Generators ---
-const onGenerateBlink = () => {
-  const color = store.selectedColor.value;
-
-  // Gen Blink: Fill with color, then frame of black
-  store.addFrame();
-  store.fillGrid(color);
-
-  store.addFrame();
-  store.fillGrid(store.DEFAULT_COLOR);
-};
-
 const onGenerateCircle = () => {
   const color = store.selectedColor.value;
   const maxRadius = Math.ceil(
@@ -1131,6 +1119,16 @@ const loadPattern = (pattern: LedPattern) => {
   gap: 16px;
   flex: 1;
   min-height: 0;
+}
+
+@media (max-width: 1200px) {
+  .workspace {
+    flex-direction: column;
+  }
+  .toolbar-wrapper {
+    width: 100%;
+    max-height: 300px;
+  }
 }
 
 .toolbar-wrapper {
