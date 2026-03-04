@@ -260,18 +260,14 @@ const sendFrameToEsp = async () => {
   try {
     const hexData = buildHexStream()
     
-    // Exact payload the ESP expects
     const payload = {
-      frameCount: 1,
-      delay: 150,
       data: hexData
     }
 
-    // Using beacon or promise-fetch but keep timeout low
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 200) // fast timeout so not blocking loops
+    const timeoutId = setTimeout(() => controller.abort(), 200)
 
-    await fetch('http://192.168.4.1/animation', {
+    await fetch('http://192.168.4.1/static', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
