@@ -136,6 +136,7 @@
           >
             <rect x="9" y="9" width="6" height="6"></rect>
           </svg>
+          <span class="shortcut-hint">_</span>
         </button>
         <button
           class="btn tool-btn"
@@ -271,6 +272,22 @@
           </svg>
           Gen: Plasma Flow
         </button>
+        <div style="display: flex; gap: 4px; margin-top: 8px;">
+          <input 
+            type="text" 
+            v-model="scrollText" 
+            placeholder="Text to scroll" 
+            style="flex: 1; padding: 4px; border-radius: 4px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white;" 
+          />
+          <button 
+            class="btn primary" 
+            @click="$emit('generateScrollText', scrollText)"
+            :disabled="!scrollText"
+            title="Gen: Scroll Text"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -297,6 +314,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+
+const scrollText = ref('')
 const store = useMatrixStore();
 const {
   selectedColor,
@@ -312,6 +332,7 @@ const emit = defineEmits([
   "generateLogo",
   "generateLogoAnimation",
   "generatePlasma",
+  "generateScrollText"
 ]);
 
 const toggleTool = (tool: "draw" | "erase" | "fill" | "picker") => {

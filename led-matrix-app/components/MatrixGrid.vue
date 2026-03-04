@@ -21,30 +21,59 @@
       </div>
     </div>
 
-    <div 
-      class="matrix-grid" 
-      @mousedown="startDrawing" 
-      @mouseup="stopDrawing" 
-      @mouseleave="stopDrawing"
-      @dragstart.prevent
-    >
-    <div 
-      v-for="(row, rIndex) in currentFrame" 
-      :key="'r-'+rIndex" 
-      class="matrix-row"
-    >
-      <div 
-        v-for="(color, cIndex) in row" 
-        :key="'c-'+cIndex" 
-        class="matrix-cell"
-        :class="{ 'highlighted-cell': hoveredPaletteColor && color.toUpperCase() === hoveredPaletteColor }"
-        :style="{ backgroundColor: color }"
-        @mousedown="applyTool(rIndex, cIndex)"
-        @mouseenter="onMouseEnter(rIndex, cIndex)"
-      >
-        <div class="led-inner"></div>
+    <div class="shift-wrapper">
+      <!-- Top arrow -->
+      <div class="shift-row shift-top">
+        <button class="shift-btn" @click="store.shiftGrid('up')" title="Shift Up">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+        </button>
       </div>
-    </div>
+
+      <div class="shift-middle">
+        <!-- Left arrow -->
+        <button class="shift-btn" @click="store.shiftGrid('left')" title="Shift Left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+
+        <!-- Matrix -->
+        <div 
+          class="matrix-grid" 
+          @mousedown="startDrawing" 
+          @mouseup="stopDrawing" 
+          @mouseleave="stopDrawing"
+          @dragstart.prevent
+        >
+          <div 
+            v-for="(row, rIndex) in currentFrame" 
+            :key="'r-'+rIndex" 
+            class="matrix-row"
+          >
+            <div 
+              v-for="(color, cIndex) in row" 
+              :key="'c-'+cIndex" 
+              class="matrix-cell"
+              :class="{ 'highlighted-cell': hoveredPaletteColor && color.toUpperCase() === hoveredPaletteColor }"
+              :style="{ backgroundColor: color }"
+              @mousedown="applyTool(rIndex, cIndex)"
+              @mouseenter="onMouseEnter(rIndex, cIndex)"
+            >
+              <div class="led-inner"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right arrow -->
+        <button class="shift-btn" @click="store.shiftGrid('right')" title="Shift Right">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+      <!-- Bottom arrow -->
+      <div class="shift-row shift-bottom">
+        <button class="shift-btn" @click="store.shiftGrid('down')" title="Shift Down">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -157,6 +186,51 @@ const onMouseEnter = (row: number, col: number) => {
 .highlighted-cell {
   box-shadow: 0 0 0 2px white, inset 0 0 2px rgba(0,0,0,0.8) !important;
   z-index: 5;
+}
+
+/* Shift wrapper layout */
+.shift-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.shift-row {
+  display: flex;
+  justify-content: center;
+}
+
+.shift-middle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shift-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.shift-btn:hover {
+  background: rgba(88, 166, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(88, 166, 255, 0.4);
+}
+
+.shift-btn:active {
+  background: rgba(88, 166, 255, 0.3);
+  transform: scale(0.92);
 }
 
 .matrix-grid {

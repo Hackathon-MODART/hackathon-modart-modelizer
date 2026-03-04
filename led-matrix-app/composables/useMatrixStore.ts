@@ -127,6 +127,46 @@ export const useMatrixStore = () => {
         }
     }
 
+    const shiftGrid = (direction: 'up' | 'down' | 'left' | 'right') => {
+        const frame = frames.value[currentFrameIndex.value]
+        if (!frame) return
+
+        if (direction === 'up') {
+            for (let r = 0; r < ROWS - 1; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    frame[r][c] = frame[r + 1][c]
+                }
+            }
+            for (let c = 0; c < COLS; c++) {
+                frame[ROWS - 1][c] = DEFAULT_COLOR
+            }
+        } else if (direction === 'down') {
+            for (let r = ROWS - 1; r > 0; r--) {
+                for (let c = 0; c < COLS; c++) {
+                    frame[r][c] = frame[r - 1][c]
+                }
+            }
+            for (let c = 0; c < COLS; c++) {
+                frame[0][c] = DEFAULT_COLOR
+            }
+        } else if (direction === 'left') {
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS - 1; c++) {
+                    frame[r][c] = frame[r][c + 1]
+                }
+                frame[r][COLS - 1] = DEFAULT_COLOR
+            }
+        } else if (direction === 'right') {
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = COLS - 1; c > 0; c--) {
+                    frame[r][c] = frame[r][c - 1]
+                }
+                frame[r][0] = DEFAULT_COLOR
+            }
+        }
+        frames.value = [...frames.value]
+    }
+
     return {
         frames,
         currentFrameIndex,
@@ -146,6 +186,7 @@ export const useMatrixStore = () => {
         duplicateFrame,
         deleteFrame,
         moveFrame,
-        selectFrame
+        selectFrame,
+        shiftGrid
     }
 }
