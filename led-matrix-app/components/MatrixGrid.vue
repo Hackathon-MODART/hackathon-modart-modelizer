@@ -118,6 +118,8 @@ const changeColorInFrame = (oldColor: string, event: Event) => {
 const isDrawing = ref(false)
 
 const startDrawing = () => {
+  // Save undo snapshot once at the start of a drawing stroke
+  store.saveSnapshot()
   isDrawing.value = true
 }
 

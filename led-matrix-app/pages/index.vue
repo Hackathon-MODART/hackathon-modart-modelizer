@@ -34,6 +34,30 @@
             style="display: none"
           />
         </label>
+        <label class="btn outline" style="margin-right: 8px; cursor: pointer">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Import Image
+          <input
+            type="file"
+            @change="importImage"
+            accept="image/png,image/jpeg,image/heic,image/heif,.png,.jpg,.jpeg,.heic,.heif"
+            style="display: none"
+          />
+        </label>
         <button
           class="btn primary"
           @click="openLoadModal"
@@ -383,9 +407,21 @@ const onKeyDown = (e: KeyboardEvent) => {
   if (e.repeat) return; // Prevent lag when holding the key down
 
   let handled = true;
+
+  // Ctrl+Z / Cmd+Z for undo
+  if (e.key.toLowerCase() === 'z' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    if (store.undo()) {
+      showNotification("Action undone", "success", 1500);
+    }
+    return;
+  }
+
   switch (e.key.toLowerCase()) {
     case "z":
-      store.currentTool.value = "erase";
+      if (!e.ctrlKey && !e.metaKey) {
+        store.currentTool.value = "erase";
+      }
       break;
     case "t":
       store.currentTool.value = "draw";
@@ -713,6 +749,73 @@ const importCode = async (event: Event) => {
   showNotification("Code imported successfully!", "success");
 };
 
+// --- Import Image Functionality ---
+const importImage = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (!target.files || target.files.length === 0) return;
+
+  const file = target.files[0];
+
+  // Create an image element
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.src = objectUrl;
+    });
+
+    // Create a hidden canvas at 32x16
+    const canvas = document.createElement("canvas");
+    canvas.width = COLS;
+    canvas.height = ROWS;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      showNotification("Canvas not supported in this browser.", "error");
+      return;
+    }
+
+    // Draw the image scaled to 32x16
+    ctx.drawImage(img, 0, 0, COLS, ROWS);
+
+    // Read pixel data
+    const imageData = ctx.getImageData(0, 0, COLS, ROWS);
+    const pixels = imageData.data; // RGBA flat array
+
+    // Create a new frame from the pixel data
+    store.addFrame();
+    store.clearGrid();
+
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        const i = (y * COLS + x) * 4;
+        const r = pixels[i];
+        const g = pixels[i + 1];
+        const b = pixels[i + 2];
+        // alpha ignored — treat as opaque
+
+        const toHex = (n: number) => n.toString(16).padStart(2, "0");
+        const hexColor = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+
+        store.setPixel(y, x, hexColor);
+      }
+    }
+
+    showNotification(
+      `Image imported as ${COLS}x${ROWS} frame!`,
+      "success"
+    );
+  } catch (err) {
+    console.error("Image import error:", err);
+    showNotification("Failed to import image. Try PNG or JPG format.", "error");
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+    target.value = "";
+  }
+};
+
 // --- Export Functionality (Send to ESP32 via JSON) ---
 const isSending = ref(false);
 
@@ -722,9 +825,9 @@ const exportCode = async () => {
     return;
   }
 
-  const delayInput = prompt("Delay between frames (ms):", "50");
-  if (delayInput === null) return; // User cancelled
-  const delayMs = parseInt(delayInput, 10) || 50;
+  const fpsInput = prompt("FPS (frames per second):", "20");
+  if (fpsInput === null) return; // User cancelled
+  const fps = parseInt(fpsInput, 10) || 20;
 
   isSending.value = true;
   showNotification("Sending animation to ESP32...", "success", 2000);
@@ -753,7 +856,7 @@ const exportCode = async () => {
 
     const payload = {
       frameCount: frameCount,
-      delay: delayMs,
+      fps: fps,
       data: hexParts.join("")
     };
 

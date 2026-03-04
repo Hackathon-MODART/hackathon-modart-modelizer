@@ -22,6 +22,14 @@ const currentActionMode = ref<ActionMode>('single')
 const isPlaying = ref<boolean>(false)
 const fps = ref<number>(10)
 
+// Undo history — stores up to 5 snapshots of {frames, currentFrameIndex}
+interface UndoSnapshot {
+    frames: MatrixFrame[]
+    frameIndex: number
+}
+const undoHistory: UndoSnapshot[] = []
+const MAX_UNDO = 5
+
 // Helper to apply intensity (0-100) to a hex color (#RRGGBB)
 export const applyIntensity = (hexColor: string, intensityPercent: number) => {
     if (hexColor === '#000000' || hexColor.toLowerCase() === '#000') return hexColor;
@@ -42,6 +50,27 @@ export const applyIntensity = (hexColor: string, intensityPercent: number) => {
 export const useMatrixStore = () => {
     const currentFrame = computed(() => frames.value[currentFrameIndex.value])
 
+    const saveSnapshot = () => {
+        const snapshot: UndoSnapshot = {
+            frames: JSON.parse(JSON.stringify(frames.value)),
+            frameIndex: currentFrameIndex.value
+        }
+        undoHistory.push(snapshot)
+        if (undoHistory.length > MAX_UNDO) {
+            undoHistory.shift()
+        }
+    }
+
+    const undo = () => {
+        if (undoHistory.length === 0) return false
+        const snapshot = undoHistory.pop()!
+        frames.value = snapshot.frames
+        currentFrameIndex.value = snapshot.frameIndex
+        return true
+    }
+
+    const canUndo = () => undoHistory.length > 0
+
     const setPixel = (row: number, col: number, color: string) => {
         if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
             frames.value[currentFrameIndex.value][row][col] = color
@@ -53,7 +82,6 @@ export const useMatrixStore = () => {
             const hex = frames.value[currentFrameIndex.value][row][col]
             selectedColor.value = hex
             selectedIntensity.value = 100
-            // Switch back to draw after picking
             currentTool.value = 'draw'
             return
         }
@@ -61,7 +89,7 @@ export const useMatrixStore = () => {
         const activeColor = applyIntensity(selectedColor.value, selectedIntensity.value)
 
         if (currentTool.value === 'fill') {
-            fillGrid(activeColor)
+            fillGridInternal(activeColor)
             return
         }
 
@@ -80,12 +108,17 @@ export const useMatrixStore = () => {
         }
     }
 
-    const fillGrid = (color: string) => {
+    // Internal fill (no snapshot — callers handle it)
+    const fillGridInternal = (color: string) => {
         frames.value[currentFrameIndex.value] = frames.value[currentFrameIndex.value].map(r => r.map(() => color))
     }
 
+    const fillGrid = (color: string) => {
+        fillGridInternal(color)
+    }
+
     const clearGrid = () => {
-        fillGrid(DEFAULT_COLOR)
+        fillGridInternal(DEFAULT_COLOR)
     }
 
     const clearAllFrames = () => {
@@ -128,6 +161,7 @@ export const useMatrixStore = () => {
     }
 
     const shiftGrid = (direction: 'up' | 'down' | 'left' | 'right') => {
+        saveSnapshot()
         const frame = frames.value[currentFrameIndex.value]
         if (!frame) return
 
@@ -187,6 +221,9 @@ export const useMatrixStore = () => {
         deleteFrame,
         moveFrame,
         selectFrame,
-        shiftGrid
+        shiftGrid,
+        saveSnapshot,
+        undo,
+        canUndo
     }
 }
