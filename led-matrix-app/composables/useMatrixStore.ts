@@ -74,6 +74,11 @@ export const useMatrixStore = () => {
         fillGrid(DEFAULT_COLOR)
     }
 
+    const clearAllFrames = () => {
+        frames.value = [createEmptyFrame()]
+        currentFrameIndex.value = 0
+    }
+
     const addFrame = () => {
         frames.value.push(createEmptyFrame())
         currentFrameIndex.value = frames.value.length - 1
@@ -121,6 +126,7 @@ export const useMatrixStore = () => {
         applyTool,
         fillGrid,
         clearGrid,
+        clearAllFrames,
         addFrame,
         duplicateFrame,
         deleteFrame,

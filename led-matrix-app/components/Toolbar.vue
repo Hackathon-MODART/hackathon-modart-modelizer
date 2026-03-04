@@ -5,56 +5,131 @@
       <input type="color" v-model="selectedColor" class="color-picker" />
       <div class="intensity-control">
         <label>Intensity: {{ selectedIntensity }}%</label>
-        <input type="range" v-model.number="selectedIntensity" min="1" max="100" />
+        <input
+          type="range"
+          v-model.number="selectedIntensity"
+          min="1"
+          max="100"
+        />
       </div>
     </div>
 
     <div class="tool-section">
       <label>Tools</label>
       <div class="button-group tools-grid">
-        <button 
-          class="btn tool-btn" 
-          :class="{ active: currentTool === 'draw' }" 
+        <button
+          class="btn tool-btn"
+          :class="{ active: currentTool === 'draw' }"
           @click="currentTool = 'draw'"
           title="Draw (T)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+            <path d="M2 2l7.586 7.586"></path>
+            <circle cx="11" cy="11" r="2"></circle>
+          </svg>
           <span class="shortcut-hint">T</span>
         </button>
-        <button 
-          class="btn tool-btn" 
-          :class="{ active: currentTool === 'erase' }" 
+        <button
+          class="btn tool-btn"
+          :class="{ active: currentTool === 'erase' }"
           @click="currentTool = 'erase'"
-          title="Erase (R)"
+          title="Erase (Z)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16C2 15 2 13 3 12L13 2L22 11L20 20Z"></path><path d="M17 14L7 20"></path></svg>
-          <span class="shortcut-hint">R</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 20H7L3 16C2 15 2 13 3 12L13 2L22 11L20 20Z"></path>
+            <path d="M17 14L7 20"></path>
+          </svg>
+          <span class="shortcut-hint">Z</span>
         </button>
-        <button 
-          class="btn tool-btn" 
-          :class="{ active: currentTool === 'fill' }" 
+        <button
+          class="btn tool-btn"
+          :class="{ active: currentTool === 'fill' }"
           @click="currentTool = 'fill'"
           title="Fill (F)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11h-8m-2 0h-2m11 4h-5m-2 0h-2m7 4h-3m-2 0h-2M12 3a9 9 0 0 0-9 9v9h18v-9a9 9 0 0 0-9-9z"></path></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M19 11h-8m-2 0h-2m11 4h-5m-2 0h-2m7 4h-3m-2 0h-2M12 3a9 9 0 0 0-9 9v9h18v-9a9 9 0 0 0-9-9z"
+            ></path>
+          </svg>
           <span class="shortcut-hint">F</span>
         </button>
-        <button 
-          class="btn tool-btn" 
-          :class="{ active: currentTool === 'row_pencil' }" 
+        <button
+          class="btn tool-btn"
+          :class="{ active: currentTool === 'row_pencil' }"
           @click="currentTool = 'row_pencil'"
           title="Row Pencil (X)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
           <span class="shortcut-hint">X</span>
         </button>
-        <button 
-          class="btn tool-btn" 
-          :class="{ active: currentTool === 'col_pencil' }" 
+        <button
+          class="btn tool-btn"
+          :class="{ active: currentTool === 'col_pencil' }"
           @click="currentTool = 'col_pencil'"
           title="Column Pencil (C)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"></line><line x1="6" y1="3" x2="6" y2="21"></line><line x1="18" y1="3" x2="18" y2="21"></line></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="12" y1="3" x2="12" y2="21"></line>
+            <line x1="6" y1="3" x2="6" y2="21"></line>
+            <line x1="18" y1="3" x2="18" y2="21"></line>
+          </svg>
           <span class="shortcut-hint">C</span>
         </button>
       </div>
@@ -64,7 +139,20 @@
       <label>Insert</label>
       <div class="button-group-vertical">
         <button class="btn" @click="$emit('generateLogo')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
           Gen: Logo Base
         </button>
       </div>
@@ -74,23 +162,75 @@
       <label>Animations (Generators)</label>
       <div class="button-group-vertical">
         <button class="btn" @click="$emit('generateBlink')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
           Gen: Blink
         </button>
         <button class="btn" @click="$emit('generateLogoAnimation')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <rect x="9" y="9" width="6" height="6"></rect>
+          </svg>
           Gen: Logo Animation
         </button>
         <button class="btn" @click="$emit('generatePlasma')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 2v20"></path>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
           Gen: Plasma Flow
         </button>
       </div>
     </div>
 
-    <div class="tool-section" style="margin-top: auto;">
+    <div class="tool-section" style="margin-top: auto">
       <button class="btn danger" @click="clearGrid">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 20H7L3 16C2 15 2 13 3 12L13 2L22 11L20 20Z"></path>
+          <path d="M17 14L7 20"></path>
+        </svg>
         Clear Frame
       </button>
     </div>
@@ -98,10 +238,22 @@
 </template>
 
 <script setup lang="ts">
-const store = useMatrixStore()
-const { selectedColor, selectedIntensity, currentTool, clearGrid } = store
+const store = useMatrixStore();
+const {
+  selectedColor,
+  selectedIntensity,
+  currentTool,
+  clearGrid,
+  clearAllFrames,
+} = store;
 
-const emit = defineEmits(['generateBlink', 'generateCircle', 'generateLogo', 'generateLogoAnimation', 'generatePlasma'])
+const emit = defineEmits([
+  "generateBlink",
+  "generateCircle",
+  "generateLogo",
+  "generateLogoAnimation",
+  "generatePlasma",
+]);
 </script>
 
 <style scoped>
