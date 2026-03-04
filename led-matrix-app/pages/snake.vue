@@ -3,7 +3,7 @@
     <header class="glass header">
       <div class="logo">
         <div class="logo-dot"></div>
-        <h1>LED Matrix Studio - Snake Game</h1>
+        <h1>LED Matrix Studio <span class="version">v{{ APP_VERSION }}</span> - Snake Game</h1>
       </div>
       <div class="actions">
         <NuxtLink to="/" class="btn outline" style="margin-right: 8px;">Back to Editor</NuxtLink>
@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { APP_VERSION } from '~/utils/version'
 
 const COLS = 32
 const ROWS = 16
@@ -374,5 +375,17 @@ onUnmounted(() => {
 .board-cell.cell-food {
   border-radius: 50%;
   box-shadow: 0 0 8px #FF3333;
+}
+.version {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #33FF33;
+  background: rgba(51, 255, 51, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+  border: 1px solid rgba(51, 255, 51, 0.2);
+  letter-spacing: 0.5px;
 }
 </style>

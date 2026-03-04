@@ -3,7 +3,7 @@
     <header class="glass header">
       <div class="logo">
         <div class="logo-dot"></div>
-        <h1>LED Matrix Studio</h1>
+        <h1>LED Matrix Studio <span class="version">v{{ APP_VERSION }}</span></h1>
       </div>
       <div class="actions">
         <NuxtLink to="/snake" class="btn primary" style="margin-right: 8px; background-color: #33FF33; color: black; border: none;">
@@ -361,6 +361,7 @@ import {
 import { usePatterns } from "~/composables/usePatterns";
 import type { LedPattern } from "~/composables/usePatterns";
 import { FONT_7X10 } from "~/utils/font";
+import { APP_VERSION } from "~/utils/version";
 import { ref, onMounted, onUnmounted } from "vue";
 
 const store = useMatrixStore();
@@ -1427,5 +1428,17 @@ const loadPattern = (pattern: LedPattern) => {
 .toast-leave-to {
   opacity: 0;
   transform: scale(0.95);
+}
+.version {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--accent-color);
+  background: rgba(88, 166, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  letter-spacing: 0.5px;
 }
 </style>
