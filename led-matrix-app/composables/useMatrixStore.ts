@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 
-export type ToolAction = 'draw' | 'erase' | 'fill'
+export type ToolAction = 'draw' | 'erase' | 'fill' | 'picker'
 export type ActionMode = 'single' | 'row' | 'col'
 export type MatrixFrame = string[][]
 
@@ -49,6 +49,15 @@ export const useMatrixStore = () => {
     }
 
     const applyTool = (row: number, col: number) => {
+        if (currentTool.value === 'picker') {
+            const hex = frames.value[currentFrameIndex.value][row][col]
+            selectedColor.value = hex
+            selectedIntensity.value = 100
+            // Switch back to draw after picking
+            currentTool.value = 'draw'
+            return
+        }
+
         const activeColor = applyIntensity(selectedColor.value, selectedIntensity.value)
 
         if (currentTool.value === 'fill') {
