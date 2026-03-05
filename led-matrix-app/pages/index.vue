@@ -6,6 +6,10 @@
         <h1>LED Matrix Studio <span class="version">v{{ APP_VERSION }}</span></h1>
       </div>
       <div class="actions">
+        <NuxtLink to="/timer" class="btn primary" style="margin-right: 8px; background-color: #58a6ff; color: black; border: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Hackathon Timer
+        </NuxtLink>
         <NuxtLink to="/snake" class="btn primary" style="margin-right: 8px; background-color: #33FF33; color: black; border: none;">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><circle cx="15" cy="13" r="1"></circle><circle cx="18" cy="11" r="1"></circle></svg>
           Play Snake
