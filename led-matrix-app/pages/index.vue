@@ -192,7 +192,10 @@
               :key="pattern.id"
               class="pattern-item"
             >
-              <div class="pattern-info">
+              <div class="pattern-preview-wrapper" style="flex-shrink: 0; margin-right: 12px; display: flex; align-items: center;">
+                <PatternPreview v-if="pattern.frames && pattern.frames.length > 0" :frames="pattern.frames" :fps="pattern.fps" :scale="2" />
+              </div>
+              <div class="pattern-info" style="flex-grow: 1;">
                 <strong>{{ pattern.name }}</strong>
                 <span class="pattern-meta"
                   >{{ pattern.frameCount }} frames | {{ pattern.fps }} FPS</span
@@ -279,7 +282,10 @@
                 :key="pattern.id"
                 class="pattern-item"
               >
-                <div class="pattern-info">
+                <div class="pattern-preview-wrapper" style="flex-shrink: 0; margin-right: 12px; display: flex; align-items: center;">
+                  <PatternPreview v-if="pattern.frames && pattern.frames.length > 0" :frames="pattern.frames" :fps="pattern.fps" :scale="2" />
+                </div>
+                <div class="pattern-info" style="flex-grow: 1;">
                   <strong>{{ pattern.name }}</strong>
                   <span class="pattern-meta"
                     >{{ pattern.frameCount }} frames |
@@ -365,6 +371,7 @@
 import MatrixGrid from "~/components/MatrixGrid.vue";
 import Toolbar from "~/components/Toolbar.vue";
 import Timeline from "~/components/Timeline.vue";
+import PatternPreview from "~/components/PatternPreview.vue";
 import {
   useMatrixStore,
   COLS,
