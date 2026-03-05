@@ -198,9 +198,19 @@
                   >{{ pattern.frameCount }} frames | {{ pattern.fps }} FPS</span
                 >
               </div>
-              <button class="btn primary small" @click="loadPattern(pattern)">
-                Load
-              </button>
+              <div class="pattern-actions" style="display: flex; gap: 8px;">
+                <button class="btn primary small" @click="loadPattern(pattern)">
+                  Load
+                </button>
+                <button 
+                  class="btn danger small" 
+                  @click="onDeletePattern(pattern)" 
+                  title="Supprimer"
+                  style="border-radius: 50%; padding: 4px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
             </li>
           </ul>
         </div>
@@ -368,7 +378,7 @@ import { APP_VERSION } from "~/utils/version";
 import { ref, onMounted, onUnmounted } from "vue";
 
 const store = useMatrixStore();
-const { savePattern, getPatterns, updatePattern, checkPatternExists } =
+const { savePattern, getPatterns, updatePattern, checkPatternExists, deletePattern } =
   usePatterns();
 
 // --- Custom Notifications System ---
@@ -1027,6 +1037,21 @@ const loadPattern = (pattern: LedPattern) => {
     `Les frames du motif '${pattern.name}' ont été ajoutées !`,
     "success",
   );
+};
+
+const onDeletePattern = async (pattern: LedPattern) => {
+  if (!pattern.id) return;
+  if (!confirm(`Êtes-vous sûr de vouloir supprimer '${pattern.name}' ?`)) return;
+
+  try {
+    await deletePattern(pattern.id);
+    showNotification(`Motif '${pattern.name}' supprimé avec succès !`, "success");
+    // Remove it from the local lists immediately
+    savedPatterns.value = savedPatterns.value.filter((p) => p.id !== pattern.id);
+  } catch (error) {
+    console.error("Delete failed:", error);
+    showNotification("Erreur lors de la suppression dans Firebase.", "error");
+  }
 };
 </script>
 

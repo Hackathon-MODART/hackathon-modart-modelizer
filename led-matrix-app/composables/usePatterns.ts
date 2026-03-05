@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, Timestamp, orderBy, query, doc, updateDoc, where } from "firebase/firestore";
+import { collection, addDoc, getDocs, Timestamp, orderBy, query, doc, updateDoc, where, deleteDoc } from "firebase/firestore";
 import { useFirebase } from "~/utils/firebase";
 
 export interface LedPattern {
@@ -99,10 +99,22 @@ export const usePatterns = () => {
     }
   };
 
+  const deletePattern = async (id: string) => {
+    try {
+      const patternRef = doc(db, "patterns", id);
+      await deleteDoc(patternRef);
+      console.log("Motif supprimé : ", id);
+    } catch (e) {
+      console.error("Erreur lors de la suppression du motif : ", e);
+      throw e;
+    }
+  };
+
   return {
     savePattern,
     getPatterns,
     updatePattern,
-    checkPatternExists
+    checkPatternExists,
+    deletePattern
   };
 };
